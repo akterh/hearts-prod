@@ -64,10 +64,7 @@ import static com.hearts.customer.R.color.hearts_back;
 public class MainActivity extends AppCompatActivity{
     private TextView back;
     private WebView webView;
-    private SwipeRefreshLayout swipe;
-    private ProgressBar progress;
     private LinearLayout noInternet;
-    private Context context;
     private ImageView splashMain;
     String url ="https://hearts.com.bd";
     public String currentUrl;
@@ -146,7 +143,7 @@ public class MainActivity extends AppCompatActivity{
 
         setContentView(R.layout.activity_main);
         webView = findViewById(R.id.webView);
-        swipe = findViewById(R.id.swipe);
+
 
         noInternet = findViewById(R.id.noInternet);
         back = findViewById(R.id.btn_back);
@@ -438,12 +435,6 @@ public class MainActivity extends AppCompatActivity{
 
 
 
-        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                webView.reload();
-            }
-        });
 
         if(savedInstanceState==null && url.contains("movies/watch")) {
             webView.post(new Runnable() {
@@ -497,10 +488,6 @@ public class MainActivity extends AppCompatActivity{
             splashMain.setVisibility(View.GONE);
 
             webView.setVisibility(View.VISIBLE);
-
-
-
-           swipe.setRefreshing(false);
         super.onPageFinished(view, url);
         }
     }

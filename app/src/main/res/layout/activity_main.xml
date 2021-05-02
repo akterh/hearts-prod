@@ -7,19 +7,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
 
-   <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-       android:id="@+id/swipe"
-       android:layout_width="match_parent"
-       android:layout_height="match_parent"
-       android:layout_above="@+id/btn_back"
-       >
+
 
       <WebView
           android:id="@+id/webView"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
-          android:visibility="invisible"/>
-   </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+          android:visibility="invisible"
+          android:layout_above="@+id/btn_back"/>
+
 
 
    <LinearLayout
@@ -33,7 +29,7 @@
           android:id="@+id/noInternetImg"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:src="@drawable/no_internet"/>
+          android:src="@drawable/no_internet__2_"/>
       <TextView
           android:id="@+id/btn_load"
           android:layout_width="wrap_content"
