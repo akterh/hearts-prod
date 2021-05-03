@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -64,7 +65,7 @@ import static com.hearts.customer.R.color.hearts_back;
 public class MainActivity extends AppCompatActivity{
     private TextView back;
     private WebView webView;
-    private LinearLayout noInternet;
+    private ImageView noInternet;
     private ImageView splashMain;
     String url ="https://hearts.com.bd";
     public String currentUrl;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity{
     private ValueCallback<Uri> mUM;
     private ValueCallback<Uri[]> mUMA;
     private final static int FCR=1;
+    private boolean doubleBackToExitPressedOnce= false;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -121,6 +123,8 @@ public class MainActivity extends AppCompatActivity{
                 mUM = null;
             }
         }
+
+        checkMediaPer();
     }
 
 
@@ -145,7 +149,7 @@ public class MainActivity extends AppCompatActivity{
         webView = findViewById(R.id.webView);
 
 
-        noInternet = findViewById(R.id.noInternet);
+        noInternet = findViewById(R.id.noInternetImg);
         back = findViewById(R.id.btn_back);
 
         splashMain = findViewById(R.id.splashMain);
@@ -427,7 +431,7 @@ public class MainActivity extends AppCompatActivity{
 
 
 
-        checkPer();
+        checkLocationPer();
         loadWebsite();
 
 
@@ -463,21 +467,56 @@ public class MainActivity extends AppCompatActivity{
 
 
             webView.goBack();
-        }
-        else {
-            new AlertDialog.Builder(this)
-                    .setTitle("Really Exit?")
-                    .setMessage("Are you sure you want to exit?")
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            MainActivity.super.onBackPressed();
-                            //this mainactivity must be replaced with your activity
-                        }
+        }else if (this.doubleBackToExitPressedOnce) {
+            new AlertDialog.Builder(this).setTitle("Really Exit?").setMessage("Are you sure you want to exit?")
 
-                    }).create().show();
+                    .setNegativeButton(android.R.string.cancel, null)
+
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    MainActivity.super.onBackPressed();
+                }
+            }).create().show();
         }
+
+
+        else {
+
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "Please click BACK again to exit",Toast.LENGTH_LONG ).show();
+            new Handler().postDelayed(new Runnable() {
+                public void run() {
+                    boolean unused = MainActivity.this.doubleBackToExitPressedOnce = false;
+                }
+            }, 2000);
+
+        }
+
+
+
+//        if (this.webView.canGoBack()) {
+//            if (this.currentUrl.contains("hearts")) {
+//                this.back.setVisibility(View.VISIBLE);
+//            } else {
+//                this.back.setVisibility(0);
+//            }
+//            this.webView.goBack();
+//        } else if (this.doubleBackToExitPressedOnce) {
+//            new AlertDialog.Builder(this).setTitle("Really Exit?").setMessage("Are you sure you want to exit?").setNegativeButton(17039360, (DialogInterface.OnClickListener) null).setPositiveButton(17039370, new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialogInterface, int i) {
+//                    MainActivity.super.onBackPressed();
+//                }
+//            }).create().show();
+//        } else {
+//            this.doubleBackToExitPressedOnce = true;
+//            Toast.makeText(this, "Please click BACK again to exit", 0).show();
+//            new Handler().postDelayed(new Runnable() {
+//                public void run() {
+//                    boolean unused = MainActivity.this.doubleBackToExitPressedOnce = false;
+//                }
+//            }, 2000);
+//        }
+
 
     }
 
@@ -488,6 +527,7 @@ public class MainActivity extends AppCompatActivity{
             splashMain.setVisibility(View.GONE);
 
             webView.setVisibility(View.VISIBLE);
+
         super.onPageFinished(view, url);
         }
     }
@@ -496,11 +536,27 @@ public class MainActivity extends AppCompatActivity{
 
 
 
-    public void checkPer() {
+    public void checkLocationPer() {
+
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        permissionsToRequest = findUnAskedPermissions(permissions);
+
+        // check permissions
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (permissionsToRequest.size() > 0) {
+                requestPermissions(permissionsToRequest.toArray(new String[permissionsToRequest.size()]),
+                        ALL_PERMISSIONS_RESULT);
+                //Log.d(TAG, "Permission requests");
+                canGetLocation = false;
+            }
+        }
+    }
+
+
+    public void checkMediaPer() {
         permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         permissions.add(Manifest.permission.CAMERA);
-        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
         permissionsToRequest = findUnAskedPermissions(permissions);
 
         // check permissions
@@ -628,6 +684,8 @@ public class MainActivity extends AppCompatActivity{
         }else{
             webView.setVisibility(View.INVISIBLE);
             noInternet.setVisibility(View.VISIBLE);
+            splashMain.setVisibility(View.INVISIBLE);
+
 
         }
 
@@ -640,6 +698,7 @@ public class MainActivity extends AppCompatActivity{
         String imageFileName = "img_"+timeStamp+"_";
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         return File.createTempFile(imageFileName,".jpg",storageDir);
+
     }
 
 
